@@ -4,7 +4,7 @@ import random
 import string
 
 class Sale(models.Model):
-    receipt_number = models.CharField(max_length=20, unique=True, blank=True)
+    receipt_number = models.CharField(max_length=20, unique=True, blank=True, default='')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity_sold = models.IntegerField()
     date = models.DateTimeField(auto_now_add=True)
