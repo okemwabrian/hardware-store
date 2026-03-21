@@ -187,31 +187,114 @@ def delete_supplier(request, supplier_id):
 
 @login_required
 def record_sale(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(stock_quantity__gt=0)
+
+    # Initialize cart in session
+    if 'cart' not in request.session:
+        request.session['cart'] = []
+
+    cart = request.session['cart']
+
     if request.method == 'POST':
-        product_id = request.POST.get('product')
-        quantity = int(request.POST.get('quantity', 0))
-        product = get_object_or_404(Product, id=product_id)
+        action = request.POST.get('action')
 
-        if quantity <= 0:
-            messages.error(request, 'Quantity must be greater than 0!')
-            return redirect('record_sale')
-        elif quantity > product.stock_quantity:
-            messages.error(request, f'Not enough stock! Only {product.stock_quantity} units available.')
-            return redirect('record_sale')
-        else:
-            sale = Sale.objects.create(product=product, quantity_sold=quantity)
-            return redirect('receipt', sale_id=sale.id)
+        if action == 'add_to_cart':
+            product_id = request.POST.get('product')
+            quantity = int(request.POST.get('quantity', 1))
+            product = get_object_or_404(Product, id=product_id)
 
-    return render(request, 'reports/record_sale.html', {'products': products})
+            if quantity <= 0:
+                messages.error(request, 'Quantity must be greater than 0!')
+            elif quantity > product.stock_quantity:
+                messages.error(request, f'Only {product.stock_quantity} units of {product.name} available!')
+            else:
+                # Check if product already in cart
+                found = False
+                for item in cart:
+                    if item['product_id'] == int(product_id):
+                        new_qty = item['quantity'] + quantity
+                        if new_qty > product.stock_quantity:
+                            messages.error(request, f'Total quantity exceeds available stock!')
+                        else:
+                            item['quantity'] = new_qty
+                            item['total'] = float(product.price) * new_qty
+                            messages.success(request, f'Updated {product.name} quantity in cart!')
+                        found = True
+                        break
+
+                if not found:
+                    cart.append({
+                        'product_id': product.id,
+                        'product_name': product.name,
+                        'category': str(product.category),
+                        'price': float(product.price),
+                        'quantity': quantity,
+                        'total': float(product.price) * quantity,
+                    })
+                    messages.success(request, f'{product.name} added to cart!')
+
+                request.session['cart'] = cart
+                request.session.modified = True
+
+        elif action == 'remove_from_cart':
+            product_id = int(request.POST.get('product_id'))
+            cart = [item for item in cart if item['product_id'] != product_id]
+            request.session['cart'] = cart
+            request.session.modified = True
+            messages.success(request, 'Item removed from cart!')
+
+        elif action == 'clear_cart':
+            request.session['cart'] = []
+            request.session.modified = True
+            messages.success(request, 'Cart cleared!')
+
+        elif action == 'checkout':
+            if not cart:
+                messages.error(request, 'Cart is empty!')
+            else:
+                # Create receipt
+                receipt_obj = Receipt.objects.create(
+                    served_by=request.user.username,
+                    total_amount=sum(item['total'] for item in cart)
+                )
+
+                # Create sale for each item
+                for item in cart:
+                    product = get_object_or_404(Product, id=item['product_id'])
+                    Sale.objects.create(
+                        receipt=receipt_obj,
+                        receipt_number=receipt_obj.receipt_number,
+                        product=product,
+                        quantity_sold=item['quantity'],
+                    )
+
+                # Clear cart
+                request.session['cart'] = []
+                request.session.modified = True
+
+                return redirect('receipt', receipt_id=receipt_obj.id)
+
+        return redirect('record_sale')
+
+    cart_total = sum(item['total'] for item in cart)
+    cart_count = sum(item['quantity'] for item in cart)
+
+    return render(request, 'reports/record_sale.html', {
+        'products': products,
+        'cart': cart,
+        'cart_total': cart_total,
+        'cart_count': cart_count,
+    })
 
 
 @login_required
-def receipt(request, sale_id):
-    sale = get_object_or_404(Sale, id=sale_id)
-    return render(request, 'reports/receipt.html', {'sale': sale})
-
-
+def receipt(request, receipt_id):
+    receipt_obj = get_object_or_404(Receipt, id=receipt_id)
+    items = receipt_obj.items.select_related('product').all()
+    return render(request, 'reports/receipt.html', {
+        'receipt': receipt_obj,
+        'items': items,
+    })
 @login_required
 def filter_sales(request):
     sales = Sale.objects.all().order_by('-date')

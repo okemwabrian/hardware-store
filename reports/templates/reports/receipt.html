@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Receipt {{ sale.receipt_number }}</title>
+    <title>Receipt {{ receipt.receipt_number }}</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; min-height: 100vh; }
-        .receipt { background: white; width: 380px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .receipt { background: white; width: 420px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
         .receipt-header { background: #1a1a2e; color: white; text-align: center; padding: 24px 20px; }
         .receipt-header h2 { font-size: 20px; margin-bottom: 4px; }
         .receipt-header p { font-size: 12px; color: #aaa; }
         .receipt-number { background: #2c7be5; color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: bold; letter-spacing: 2px; }
-        .receipt-body { padding: 24px; }
-        .receipt-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
-        .receipt-row:last-child { border-bottom: none; }
-        .receipt-row .label { color: #888; }
-        .receipt-row .value { font-weight: bold; color: #333; }
-        .receipt-total { background: #f0f2f5; border-radius: 6px; padding: 16px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .receipt-total .label { font-size: 15px; color: #555; font-weight: bold; }
-        .receipt-total .amount { font-size: 24px; color: #2c7be5; font-weight: bold; }
-        .served-box { background: #e8f0fe; border-radius: 6px; padding: 12px 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .served-box .label { font-size: 13px; color: #555; }
-        .served-box .value { font-size: 14px; font-weight: bold; color: #2c7be5; }
+        .receipt-body { padding: 20px; }
+        .section-title { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
+        .items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .items-table th { color: #888; padding: 6px 0; text-align: left; font-size: 12px; border-bottom: 1px solid #eee; }
+        .items-table th:last-child { text-align: right; }
+        .items-table td { padding: 8px 0; border-bottom: 1px dashed #f0f0f0; vertical-align: top; }
+        .items-table td:last-child { text-align: right; font-weight: bold; }
+        .items-table tr:last-child td { border-bottom: none; }
+        .item-name { font-weight: bold; color: #333; }
+        .item-detail { font-size: 11px; color: #888; margin-top: 2px; }
+        .receipt-summary { background: #f8f9fa; border-radius: 6px; padding: 14px; margin-top: 16px; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
+        .summary-row .sl { color: #888; }
+        .summary-row .sv { font-weight: bold; color: #333; }
+        .total-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; margin-top: 8px; border-top: 2px solid #eee; }
+        .total-row .tl { font-size: 16px; font-weight: bold; color: #333; }
+        .total-row .ta { font-size: 26px; font-weight: bold; color: #2c7be5; }
+        .served-box { background: #e8f0fe; border-radius: 6px; padding: 10px 14px; margin-top: 12px; display: flex; justify-content: space-between; }
+        .served-box .sl { font-size: 12px; color: #555; }
+        .served-box .sv { font-size: 13px; font-weight: bold; color: #2c7be5; }
         .receipt-footer { text-align: center; padding: 16px; color: #aaa; font-size: 12px; border-top: 1px dashed #eee; margin-top: 16px; }
-        .btn-row { display: flex; gap: 10px; padding: 16px 24px; border-top: 1px solid #f0f0f0; }
+        .btn-row { display: flex; gap: 10px; padding: 16px; border-top: 1px solid #f0f0f0; }
         .btn { flex: 1; padding: 10px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; border: none; cursor: pointer; text-align: center; }
         .btn-print { background: #2c7be5; color: white; }
         .btn-new { background: #20c997; color: white; }
@@ -41,44 +50,59 @@
     <div class="receipt-header">
         <h2>Hardware Store</h2>
         <p>Management System</p>
-        <p style="margin-top:8px; font-size:11px;">{{ sale.date|date:"d M Y, H:i" }}</p>
+        <p style="margin-top:8px; font-size:11px;">{{ receipt.date|date:"d M Y, H:i" }}</p>
     </div>
 
     <div class="receipt-number">
-        RECEIPT NO: {{ sale.receipt_number }}
+        RECEIPT NO: {{ receipt.receipt_number }}
     </div>
 
     <div class="receipt-body">
 
-        <div class="receipt-row">
-            <span class="label">Product</span>
-            <span class="value">{{ sale.product.name }}</span>
-        </div>
-        <div class="receipt-row">
-            <span class="label">Category</span>
-            <span class="value">{{ sale.product.category }}</span>
-        </div>
-        <div class="receipt-row">
-            <span class="label">Supplier</span>
-            <span class="value">{{ sale.product.supplier }}</span>
-        </div>
-        <div class="receipt-row">
-            <span class="label">Unit Price</span>
-            <span class="value">KSh {{ sale.product.price }}</span>
-        </div>
-        <div class="receipt-row">
-            <span class="label">Quantity</span>
-            <span class="value">{{ sale.quantity_sold }}</span>
-        </div>
+        <div class="section-title">Items Purchased</div>
 
-        <div class="receipt-total">
-            <span class="label">TOTAL</span>
-            <span class="amount">KSh {{ sale.total_price }}</span>
+        <table class="items-table">
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+            {% for item in items %}
+            <tr>
+                <td>
+                    <div class="item-name">{{ item.product.name }}</div>
+                    <div class="item-detail">{{ item.product.category }} — KSh {{ item.product.price }} each</div>
+                </td>
+                <td>{{ item.quantity_sold }}</td>
+                <td>KSh {{ item.product.price }}</td>
+                <td>KSh {{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="receipt-summary">
+            <div class="summary-row">
+                <span class="sl">Items</span>
+                <span class="sv">{{ items.count }} product(s)</span>
+            </div>
+            <div class="summary-row">
+                <span class="sl">Total Quantity</span>
+                <span class="sv">
+                    {% with total_qty=0 %}
+                    {{ items|length }}
+                    {% endwith %}
+                </span>
+            </div>
+            <div class="total-row">
+                <span class="tl">TOTAL</span>
+                <span class="ta">KSh {{ receipt.total_amount }}</span>
+            </div>
         </div>
 
         <div class="served-box">
-            <span class="label">Served by</span>
-            <span class="value">{{ request.user.get_full_name|default:request.user.username }}</span>
+            <span class="sl">Served by</span>
+            <span class="sv">{{ receipt.served_by }}</span>
         </div>
 
     </div>

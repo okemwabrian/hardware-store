@@ -5,7 +5,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; }
-        .sidebar { width: 220px; min-height: 100vh; background: #1a1a2e; position: fixed; top: 0; left: 0; }
+        .sidebar { width: 220px; min-height: 100vh; background: #1a1a2e; position: fixed; top: 0; left: 0; overflow-y: auto; }
         .sidebar-logo { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
         .sidebar-logo .icon { width: 52px; height: 52px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 8px; }
         .sidebar-logo h2 { color: white; font-size: 14px; }
@@ -19,28 +19,43 @@
         .main { margin-left: 220px; flex: 1; }
         .topbar { background: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
         .topbar h3 { color: #333; font-size: 18px; }
-        .content { padding: 24px; max-width: 600px; }
-        .card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
-        .card-header { background: #20c997; color: white; padding: 14px 20px; font-weight: bold; font-size: 15px; }
-        .card-body { padding: 24px; }
-        label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; margin-top: 16px; }
+        .content { padding: 24px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 14px 20px; font-weight: bold; font-size: 15px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .card-header.teal { background: #20c997; }
+        .card-header.purple { background: #6f42c1; }
+        .card-header.red { background: #dc3545; }
+        .card-body { padding: 20px; }
+        label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; margin-top: 14px; }
         label:first-child { margin-top: 0; }
         select, input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
         select:focus, input:focus { outline: none; border-color: #2c7be5; }
-        .stock-info { font-size: 12px; color: #888; margin-top: 6px; }
-        .preview-box { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 20px; border: 1px solid #eee; }
-        .preview-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; }
-        .preview-row .plabel { color: #888; }
-        .preview-row .pvalue { font-weight: bold; color: #333; }
-        .preview-divider { border: none; border-top: 1px dashed #ddd; margin: 8px 0; }
-        .preview-total { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
-        .preview-total .tlabel { font-size: 15px; font-weight: bold; color: #333; }
-        .preview-total .tamount { font-size: 24px; font-weight: bold; color: #2c7be5; }
-        .btn-submit { width: 100%; padding: 13px; background: #20c997; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-submit:hover { background: #17a589; }
-        .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+        .stock-info { font-size: 12px; color: #888; margin-top: 5px; }
+        .preview-box { background: #f8f9fa; border-radius: 6px; padding: 14px; margin-top: 14px; }
+        .preview-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; }
+        .preview-row .pl { color: #888; }
+        .preview-row .pv { font-weight: bold; color: #333; }
+        .btn-add { width: 100%; padding: 12px; background: #20c997; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 14px; }
+        .btn-add:hover { background: #17a589; }
+        .msg { padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-size: 13px; }
+        .msg.success { background: #d4edda; color: #155724; }
         .msg.error { background: #f8d7da; color: #721c24; }
-        a.back { color: #2c7be5; text-decoration: none; font-size: 13px; }
+
+        /* Cart */
+        .cart-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .cart-table th { background: #f8f9fa; color: #555; padding: 8px 12px; text-align: left; font-size: 12px; border-bottom: 1px solid #eee; }
+        .cart-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; }
+        .cart-table tr:last-child td { border-bottom: none; }
+        .btn-remove { padding: 3px 10px; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .cart-total-row { background: #f0f2f5; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; }
+        .cart-total-row .label { font-size: 14px; color: #555; font-weight: bold; }
+        .cart-total-row .amount { font-size: 22px; font-weight: bold; color: #2c7be5; }
+        .btn-checkout { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-checkout:hover { background: #218838; }
+        .btn-clear { padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        .empty-cart { padding: 30px; text-align: center; color: #aaa; font-size: 14px; }
+        .badge-count { background: #dc3545; color: white; border-radius: 20px; padding: 2px 8px; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -74,70 +89,140 @@
 <div class="main">
     <div class="topbar">
         <h3>Record Sale</h3>
-        <a href="/dashboard/" class="back">Back to Dashboard</a>
+        <a href="/dashboard/" style="color:#2c7be5; text-decoration:none; font-size:13px;">Back to Dashboard</a>
     </div>
+
     <div class="content">
 
         {% if messages %}
             {% for message in messages %}
-                <div class="msg error">{{ message }}</div>
+                <div class="msg {% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
 
-        <div class="card">
-            <div class="card-header">New Sale</div>
-            <div class="card-body">
-                <form method="POST" id="sale-form">
-                    {% csrf_token %}
+        <div class="grid">
 
-                    <label>Select Product</label>
-                    <select name="product" id="product-select" onchange="updatePreview()">
-                        {% for product in products %}
-                        <option value="{{ product.id }}"
-                                data-price="{{ product.price }}"
-                                data-stock="{{ product.stock_quantity }}"
-                                data-category="{{ product.category }}">
-                            {{ product.name }} — KSh {{ product.price }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <div class="stock-info" id="stock-info">Select a product to see stock</div>
+            <!-- Left: Add item to cart -->
+            <div>
+                <div class="card">
+                    <div class="card-header teal">Add Item to Cart</div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_to_cart">
 
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" id="quantity" min="1" value="1" oninput="updatePreview()" required>
+                            <label>Select Product</label>
+                            <select name="product" id="product-select" onchange="updatePreview()">
+                                {% for product in products %}
+                                <option value="{{ product.id }}"
+                                        data-price="{{ product.price }}"
+                                        data-stock="{{ product.stock_quantity }}"
+                                        data-category="{{ product.category }}">
+                                    {{ product.name }} — KSh {{ product.price }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="stock-info" id="stock-info">Select a product</div>
 
-                    <!-- Live preview box -->
-                    <div class="preview-box">
-                        <div class="preview-row">
-                            <span class="plabel">Product</span>
-                            <span class="pvalue" id="preview-name">-</span>
+                            <label>Quantity</label>
+                            <input type="number" name="quantity" id="quantity" min="1" value="1" oninput="updatePreview()" required>
+
+                            <div class="preview-box">
+                                <div class="preview-row">
+                                    <span class="pl">Product</span>
+                                    <span class="pv" id="prev-name">-</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="pl">Unit Price</span>
+                                    <span class="pv" id="prev-price">-</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span class="pl">Quantity</span>
+                                    <span class="pv" id="prev-qty">-</span>
+                                </div>
+                                <div class="preview-row" style="border-top:1px solid #ddd; margin-top:8px; padding-top:8px;">
+                                    <span class="pl" style="font-weight:bold;">Item Total</span>
+                                    <span class="pv" style="color:#2c7be5; font-size:16px;" id="prev-total">-</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-add">Add to Cart</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Cart -->
+            <div>
+                <div class="card">
+                    <div class="card-header purple">
+                        Cart
+                        {% if cart %}
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <span class="badge-count">{{ cart_count }} items</span>
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="clear_cart">
+                                <button type="submit" class="btn-clear">Clear</button>
+                            </form>
                         </div>
-                        <div class="preview-row">
-                            <span class="plabel">Category</span>
-                            <span class="pvalue" id="preview-category">-</span>
-                        </div>
-                        <div class="preview-row">
-                            <span class="plabel">Unit Price</span>
-                            <span class="pvalue" id="preview-price">KSh 0.00</span>
-                        </div>
-                        <div class="preview-row">
-                            <span class="plabel">Quantity</span>
-                            <span class="pvalue" id="preview-qty">0</span>
-                        </div>
-                        <div class="preview-row">
-                            <span class="plabel">Served by</span>
-                            <span class="pvalue" style="color:#2c7be5;">{{ request.user.username }}</span>
-                        </div>
-                        <hr class="preview-divider">
-                        <div class="preview-total">
-                            <span class="tlabel">Total Amount</span>
-                            <span class="tamount" id="preview-total">KSh 0.00</span>
-                        </div>
+                        {% endif %}
                     </div>
 
-                    <button type="submit" class="btn-submit">Record Sale and Print Receipt</button>
-                </form>
+                    {% if cart %}
+                    <table class="cart-table">
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                        {% for item in cart %}
+                        <tr>
+                            <td>
+                                {{ item.product_name }}<br>
+                                <span style="font-size:11px; color:#888;">{{ item.category }}</span>
+                            </td>
+                            <td>KSh {{ item.price }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>KSh {{ item.total }}</td>
+                            <td>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="remove_from_cart">
+                                    <input type="hidden" name="product_id" value="{{ item.product_id }}">
+                                    <button type="submit" class="btn-remove">X</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+
+                    <div class="cart-total-row">
+                        <span class="label">Total</span>
+                        <span class="amount">KSh {{ cart_total }}</span>
+                    </div>
+
+                    <div style="padding:16px;">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="checkout">
+                            <button type="submit" class="btn-checkout">Checkout and Print Receipt</button>
+                        </form>
+                    </div>
+
+                    {% else %}
+                    <div class="empty-cart">
+                        Cart is empty — add products from the left
+                    </div>
+                    {% endif %}
+
+                </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -149,15 +234,13 @@
         const selected = select.options[select.selectedIndex];
         const price = parseFloat(selected.dataset.price) || 0;
         const stock = selected.dataset.stock;
-        const category = selected.dataset.category;
         const name = selected.text.split(' —')[0];
 
         document.getElementById('stock-info').textContent = 'Available stock: ' + stock + ' units';
-        document.getElementById('preview-name').textContent = name;
-        document.getElementById('preview-category').textContent = category || '-';
-        document.getElementById('preview-price').textContent = 'KSh ' + price.toLocaleString('en-KE', {minimumFractionDigits: 2});
-        document.getElementById('preview-qty').textContent = qty;
-        document.getElementById('preview-total').textContent = 'KSh ' + (price * qty).toLocaleString('en-KE', {minimumFractionDigits: 2});
+        document.getElementById('prev-name').textContent = name;
+        document.getElementById('prev-price').textContent = 'KSh ' + price.toLocaleString('en-KE', {minimumFractionDigits: 2});
+        document.getElementById('prev-qty').textContent = qty;
+        document.getElementById('prev-total').textContent = 'KSh ' + (price * qty).toLocaleString('en-KE', {minimumFractionDigits: 2});
     }
     updatePreview();
 </script>
