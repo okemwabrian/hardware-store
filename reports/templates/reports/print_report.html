@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sales Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background: white; }
+        h1 { color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .summary { display: flex; gap: 40px; margin: 20px 0; }
+        .summary-item h2 { margin: 0; color: #2c7be5; font-size: 28px; }
+        .summary-item p { margin: 4px 0 0; color: #666; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { background: #333; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
+        .no-print { margin-bottom: 20px; }
+        .btn { padding: 8px 20px; background: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+        a { color: #2c7be5; text-decoration: none; margin-right: 20px; }
+        .date-filter { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+        .date-filter input { padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .date-filter button { padding: 7px 16px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        @media print {
+            .no-print { display: none; }
+            body { margin: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <a href="/dashboard/">← Back to Dashboard</a>
+
+        <form method="GET" style="display:inline;">
+            <div class="date-filter">
+                <label>From:</label>
+                <input type="date" name="date_from" value="{{ date_from }}">
+                <label>To:</label>
+                <input type="date" name="date_to" value="{{ date_to }}">
+                <button type="submit">Generate</button>
+                <button type="button" class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="header">
+        <div>
+            <h1>🔧 Hardware Store — Sales Report</h1>
+            <p>Period: {{ date_from }} to {{ date_to }}</p>
+        </div>
+        <div style="text-align:right; color:#666; font-size:13px;">
+            Generated on: {% now "d M Y, H:i" %}
+        </div>
+    </div>
+
+    <div class="summary">
+        <div class="summary-item">
+            <h2>KSh {{ total_revenue }}</h2>
+            <p>Total Revenue</p>
+        </div>
+        <div class="summary-item">
+            <h2>{{ total_items }}</h2>
+            <p>Total Items Sold</p>
+        </div>
+        <div class="summary-item">
+            <h2>{{ sales.count }}</h2>
+            <p>Transactions</p>
+        </div>
+    </div>
+
+    <h2>Daily Summary</h2>
+    <table>
+        <tr>
+            <th>Date</th><th>Revenue (KSh)</th><th>Items Sold</th>
+        </tr>
+        {% for day in daily %}
+        <tr>
+            <td>{{ day.day }}</td>
+            <td>{{ day.revenue }}</td>
+            <td>{{ day.items }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No data for this period.</td></tr>
+        {% endfor %}
+    </table>
+
+    <h2>Transaction Details</h2>
+    <table>
+        <tr>
+            <th>Product</th><th>Quantity</th><th>Total Price (KSh)</th><th>Date & Time</th>
+        </tr>
+        {% for sale in sales %}
+        <tr>
+            <td>{{ sale.product.name }}</td>
+            <td>{{ sale.quantity_sold }}</td>
+            <td>{{ sale.total_price }}</td>
+            <td>{{ sale.date|date:"d M Y, H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
