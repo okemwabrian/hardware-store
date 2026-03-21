@@ -1,0 +1,15 @@
+# Python
+hardware_env/
+__pycache__/
+*.pyc
+*.pyo
+
+# Django
+*.sqlite3
+*.log
+
+# PyCharm
+.idea/
+
+# Environment variables
+.env
