@@ -6,6 +6,7 @@ __pycache__/
 
 # Django
 *.sqlite3
+*.db.sqlite3
 *.log
 
 # PyCharm
