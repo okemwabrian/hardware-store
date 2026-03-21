@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Products</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        .search-bar { display: flex; gap: 10px; margin-bottom: 30px; }
+        input[type="text"] { padding: 10px; width: 400px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        button { padding: 10px 20px; background: #2c7be5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #1a68d1; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th { background: #2c7be5; color: white; padding: 12px; text-align: left; }
+        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
+        .low { color: red; font-weight: bold; }
+        .ok { color: green; }
+        a { color: #2c7be5; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back { margin-bottom: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <a class="back" href="/dashboard/">← Back to Dashboard</a>
+    <h1>Search Products</h1>
+
+    <form method="GET" action="/search/">
+        <div class="search-bar">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search by product name...">
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    {% if query %}
+        <p>Results for <strong>"{{ query }}"</strong>: {{ results.count }} item(s) found</p>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price (KSh)</th>
+                <th>Stock</th>
+                <th>Status</th>
+            </tr>
+            {% for product in results %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.category }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.stock_quantity }}</td>
+                <td>
+                    {% if product.is_low_stock %}
+                        <span class="low">⚠️ Low Stock</span>
+                    {% else %}
+                        <span class="ok">✅ OK</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No products found.</td></tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html>
