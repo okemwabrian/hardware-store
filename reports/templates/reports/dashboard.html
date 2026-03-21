@@ -14,10 +14,19 @@
         td { padding: 10px 12px; border-bottom: 1px solid #eee; }
         .alert { color: red; font-weight: bold; }
         h2 { color: #333; margin-top: 30px; }
+        .success-msg { background: #d4edda; color: #155724; padding: 12px 20px; border-radius: 6px; margin-bottom: 16px; }
+        .restock-btn { padding: 6px 14px; background: #2c7be5; color: white; border-radius: 4px; text-decoration: none; font-size: 13px; }
+        .restock-btn:hover { background: #1a68d1; }
     </style>
 </head>
 <body>
     <h1>Hardware Store Dashboard</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-msg">✅ {{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
     <a href="/search/" style="display:inline-block; margin-bottom:20px; padding: 10px 20px; background:#2c7be5; color:white; border-radius:6px; text-decoration:none;">🔍 Search Products</a>
 
@@ -43,6 +52,7 @@
             <th>Category</th>
             <th>Current Stock</th>
             <th>Reorder Level</th>
+            <th>Action</th>
         </tr>
         {% for item in low_stock_items %}
         <tr>
@@ -50,9 +60,12 @@
             <td>{{ item.category }}</td>
             <td class="alert">{{ item.stock_quantity }}</td>
             <td>{{ item.reorder_level }}</td>
+            <td>
+                <a href="/restock/{{ item.id }}/" class="restock-btn">Restock</a>
+            </td>
         </tr>
         {% empty %}
-        <tr><td colspan="4">All items are sufficiently stocked!</td></tr>
+        <tr><td colspan="5">All items are sufficiently stocked!</td></tr>
         {% endfor %}
     </table>
 
@@ -74,7 +87,7 @@
         {% endfor %}
     </table>
 
-<h2>Sales Chart</h2>
+    <h2>Sales Chart</h2>
     <div style="background:white; padding:20px; border-radius:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <canvas id="salesChart" height="100"></canvas>
     </div>

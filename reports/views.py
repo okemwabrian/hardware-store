@@ -3,6 +3,8 @@ from django.db.models import Sum, F
 from inventory.models import Product
 from sales.models import Sale
 from django.db.models.functions import TruncDate
+from django.shortcuts import redirect
+from django.contrib import messages
 
 def dashboard(request):
     total_products = Product.objects.count()
@@ -41,3 +43,14 @@ def search_products(request):
         'query': query,
         'results': results,
     })
+
+def restock_product(request, product_id):
+    product = Product.objects.get(id=product_id)
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity', 0))
+        if quantity > 0:
+            product.stock_quantity += quantity
+            product.save()
+            messages.success(request, f'{product.name} restocked by {quantity} units!')
+        return redirect('dashboard')
+    return render(request, 'reports/restock.html', {'product': product})
