@@ -3,97 +3,203 @@
 <head>
     <title>Sales Report</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; background: white; }
-        h1 { color: #333; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .summary { display: flex; gap: 40px; margin: 20px 0; }
-        .summary-item h2 { margin: 0; color: #2c7be5; font-size: 28px; }
-        .summary-item p { margin: 4px 0 0; color: #666; font-size: 13px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        th { background: #333; color: white; padding: 10px; text-align: left; }
-        td { padding: 8px 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
-        .no-print { margin-bottom: 20px; }
-        .btn { padding: 8px 20px; background: #2c7be5; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; }
-        a { color: #2c7be5; text-decoration: none; margin-right: 20px; }
-        .date-filter { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
-        .date-filter input { padding: 7px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .date-filter button { padding: 7px 16px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; }
+        .sidebar { width: 220px; min-height: 100vh; background: #1a1a2e; position: fixed; top: 0; left: 0; overflow-y: auto; }
+        .sidebar-logo { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .sidebar-logo .icon { width: 52px; height: 52px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 8px; }
+        .sidebar-logo h2 { color: white; font-size: 14px; }
+        .sidebar-logo p { color: #aaa; font-size: 12px; margin-top: 2px; }
+        .sidebar-menu { padding: 16px 0; }
+        .menu-label { color: #555; font-size: 11px; padding: 10px 20px 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .menu-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; color: #bbb; text-decoration: none; font-size: 14px; }
+        .menu-item:hover, .menu-item.active { background: #2c7be5; color: white; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 16px; }
+        .sidebar-footer a { color: #ff6b6b; text-decoration: none; font-size: 13px; }
+        .main { margin-left: 220px; flex: 1; }
+        .topbar { background: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .topbar h3 { color: #333; font-size: 18px; }
+        .content { padding: 24px; }
+
+        .filter-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 24px; }
+        .filter-card h4 { font-size: 14px; color: #555; margin-bottom: 16px; font-weight: 600; }
+        .filter-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 12px; color: #888; }
+        .filter-group input { padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .filter-group input:focus { outline: none; border-color: #2c7be5; }
+        .btn-generate { padding: 9px 24px; background: #333; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-print { padding: 9px 20px; background: #2c7be5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-excel { padding: 9px 20px; background: #1D6F42; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; }
+
+        .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .summary-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 20px; text-align: center; }
+        .summary-card h2 { font-size: 26px; font-weight: bold; margin-bottom: 4px; }
+        .summary-card p { font-size: 13px; color: #888; }
+        .summary-card.blue h2 { color: #2c7be5; }
+        .summary-card.green h2 { color: #28a745; }
+        .summary-card.purple h2 { color: #6f42c1; }
+
+        .panel { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 24px; }
+        .panel-header { padding: 14px 20px; font-weight: bold; font-size: 14px; color: white; }
+        .panel-header.dark { background: #1a1a2e; }
+        .panel-header.blue { background: #2c7be5; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f8f9fa; color: #555; padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; font-size: 12px; }
+        td { padding: 10px 16px; border-bottom: 1px solid #f5f5f5; color: #333; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        .empty { padding: 24px; text-align: center; color: #aaa; font-size: 13px; }
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .badge-blue { background: #e8f0fe; color: #2c7be5; }
+
+        /* Print styles */
         @media print {
-            .no-print { display: none; }
-            body { margin: 15px; }
+            .sidebar, .topbar, .filter-card, .no-print { display: none !important; }
+            .main { margin-left: 0; }
+            body { background: white; display: block; }
+            .content { padding: 0; }
+            .panel { box-shadow: none; border: 1px solid #ddd; }
+            .print-header { display: block !important; }
+            .summary-card { box-shadow: none; border: 1px solid #ddd; }
         }
     </style>
 </head>
 <body>
-    <div class="no-print">
-        <a href="/dashboard/">← Back to Dashboard</a>
 
-        <form method="GET" style="display:inline;">
-            <div class="date-filter">
-                <label>From:</label>
-                <input type="date" name="date_from" value="{{ date_from }}">
-                <label>To:</label>
-                <input type="date" name="date_to" value="{{ date_to }}">
-                <button type="submit">Generate</button>
-                <button type="button" class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <div class="icon">H</div>
+        <h2>Hardware Store</h2>
+        <p>Management System</p>
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-label">Main</div>
+        <a href="/dashboard/" class="menu-item">Dashboard</a>
+        <div class="menu-label">Inventory</div>
+        <a href="/product/add/" class="menu-item">Add Product</a>
+        <a href="/search/" class="menu-item">Search Products</a>
+        <div class="menu-label">Sales</div>
+        <a href="/sale/record/" class="menu-item">Record Sale</a>
+        <a href="/sales/filter/" class="menu-item">Filter Sales</a>
+        <div class="menu-label">Reports</div>
+        <a href="/report/print/" class="menu-item active">Print Report</a>
+        <a href="/export/excel/" class="menu-item">Export to Excel</a>
+        <div class="menu-label">System</div>
+        <a href="/settings/" class="menu-item">Settings</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/accounts/logout/">Logout — {{ request.user.username }}</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar no-print">
+        <h3>Sales Report</h3>
+        <a href="/dashboard/" style="color:#2c7be5; text-decoration:none; font-size:13px;">Back to Dashboard</a>
+    </div>
+
+    <div class="content">
+
+        <!-- Filter form -->
+        <div class="filter-card no-print">
+            <h4>Generate Report for Date Range</h4>
+            <form method="GET">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>From Date</label>
+                        <input type="date" name="date_from" value="{{ date_from }}">
+                    </div>
+                    <div class="filter-group">
+                        <label>To Date</label>
+                        <input type="date" name="date_to" value="{{ date_to }}">
+                    </div>
+                    <button type="submit" class="btn-generate">Generate</button>
+                    <button type="button" class="btn-print" onclick="window.print()">Print / Save PDF</button>
+                    <a href="/export/excel/?date_from={{ date_from }}&date_to={{ date_to }}" class="btn-excel">Export Excel</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Print header — only shows when printing -->
+        <div style="display:none;" class="print-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; padding-bottom:12px; margin-bottom:20px;">
+                <div>
+                    <h2 style="font-size:22px; color:#333;">Hardware Store — Sales Report</h2>
+                    <p style="color:#666; font-size:13px; margin-top:4px;">Period: {{ date_from }} to {{ date_to }}</p>
+                </div>
+                <div style="text-align:right; color:#888; font-size:12px;">
+                    Generated: {% now "d M Y, H:i" %}<br>
+                    By: {{ request.user.username }}
+                </div>
             </div>
-        </form>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="summary">
+            <div class="summary-card blue">
+                <h2>KSh {{ total_revenue }}</h2>
+                <p>Total Revenue</p>
+            </div>
+            <div class="summary-card green">
+                <h2>{{ total_items }}</h2>
+                <p>Total Items Sold</p>
+            </div>
+            <div class="summary-card purple">
+                <h2>{{ sales.count }}</h2>
+                <p>Transactions</p>
+            </div>
+        </div>
+
+        <!-- Daily summary -->
+        <div class="panel">
+            <div class="panel-header dark">Daily Summary</div>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Revenue (KSh)</th>
+                    <th>Items Sold</th>
+                </tr>
+                {% for day in daily %}
+                <tr>
+                    <td>{{ day.day }}</td>
+                    <td>KSh {{ day.revenue }}</td>
+                    <td>{{ day.items }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="empty">No data for this period</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <!-- Transaction details -->
+        <div class="panel">
+            <div class="panel-header blue">Transaction Details</div>
+            <table>
+                <tr>
+                    <th>Receipt No</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Total Price (KSh)</th>
+                    <th>Date and Time</th>
+                </tr>
+                {% for sale in sales %}
+                <tr>
+                    <td><span class="badge badge-blue">{{ sale.receipt_number }}</span></td>
+                    <td>{{ sale.product.name }}</td>
+                    <td>{{ sale.product.category }}</td>
+                    <td>{{ sale.quantity_sold }}</td>
+                    <td>{{ sale.total_price }}</td>
+                    <td>{{ sale.date|date:"d M Y, H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="empty">No transactions for this period</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+
     </div>
-
-    <div class="header">
-        <div>
-            <h1>🔧 Hardware Store — Sales Report</h1>
-            <p>Period: {{ date_from }} to {{ date_to }}</p>
-        </div>
-        <div style="text-align:right; color:#666; font-size:13px;">
-            Generated on: {% now "d M Y, H:i" %}
-        </div>
-    </div>
-
-    <div class="summary">
-        <div class="summary-item">
-            <h2>KSh {{ total_revenue }}</h2>
-            <p>Total Revenue</p>
-        </div>
-        <div class="summary-item">
-            <h2>{{ total_items }}</h2>
-            <p>Total Items Sold</p>
-        </div>
-        <div class="summary-item">
-            <h2>{{ sales.count }}</h2>
-            <p>Transactions</p>
-        </div>
-    </div>
-
-    <h2>Daily Summary</h2>
-    <table>
-        <tr>
-            <th>Date</th><th>Revenue (KSh)</th><th>Items Sold</th>
-        </tr>
-        {% for day in daily %}
-        <tr>
-            <td>{{ day.day }}</td>
-            <td>{{ day.revenue }}</td>
-            <td>{{ day.items }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="3">No data for this period.</td></tr>
-        {% endfor %}
-    </table>
-
-    <h2>Transaction Details</h2>
-    <table>
-        <tr>
-            <th>Product</th><th>Quantity</th><th>Total Price (KSh)</th><th>Date & Time</th>
-        </tr>
-        {% for sale in sales %}
-        <tr>
-            <td>{{ sale.product.name }}</td>
-            <td>{{ sale.quantity_sold }}</td>
-            <td>{{ sale.total_price }}</td>
-            <td>{{ sale.date|date:"d M Y, H:i" }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+</div>
 </body>
 </html>

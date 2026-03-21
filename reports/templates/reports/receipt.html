@@ -18,7 +18,10 @@
         .receipt-total { background: #f0f2f5; border-radius: 6px; padding: 16px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; }
         .receipt-total .label { font-size: 15px; color: #555; font-weight: bold; }
         .receipt-total .amount { font-size: 24px; color: #2c7be5; font-weight: bold; }
-        .receipt-footer { text-align: center; padding: 16px; color: #aaa; font-size: 12px; border-top: 1px dashed #eee; }
+        .served-box { background: #e8f0fe; border-radius: 6px; padding: 12px 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .served-box .label { font-size: 13px; color: #555; }
+        .served-box .value { font-size: 14px; font-weight: bold; color: #2c7be5; }
+        .receipt-footer { text-align: center; padding: 16px; color: #aaa; font-size: 12px; border-top: 1px dashed #eee; margin-top: 16px; }
         .btn-row { display: flex; gap: 10px; padding: 16px 24px; border-top: 1px solid #f0f0f0; }
         .btn { flex: 1; padding: 10px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; border: none; cursor: pointer; text-align: center; }
         .btn-print { background: #2c7be5; color: white; }
@@ -34,6 +37,7 @@
 </head>
 <body>
 <div class="receipt">
+
     <div class="receipt-header">
         <h2>Hardware Store</h2>
         <p>Management System</p>
@@ -45,6 +49,7 @@
     </div>
 
     <div class="receipt-body">
+
         <div class="receipt-row">
             <span class="label">Product</span>
             <span class="value">{{ sale.product.name }}</span>
@@ -54,6 +59,10 @@
             <span class="value">{{ sale.product.category }}</span>
         </div>
         <div class="receipt-row">
+            <span class="label">Supplier</span>
+            <span class="value">{{ sale.product.supplier }}</span>
+        </div>
+        <div class="receipt-row">
             <span class="label">Unit Price</span>
             <span class="value">KSh {{ sale.product.price }}</span>
         </div>
@@ -61,15 +70,17 @@
             <span class="label">Quantity</span>
             <span class="value">{{ sale.quantity_sold }}</span>
         </div>
-        <div class="receipt-row">
-            <span class="label">Served by</span>
-            <span class="value">{{ request.user.username }}</span>
-        </div>
 
         <div class="receipt-total">
             <span class="label">TOTAL</span>
             <span class="amount">KSh {{ sale.total_price }}</span>
         </div>
+
+        <div class="served-box">
+            <span class="label">Served by</span>
+            <span class="value">{{ request.user.get_full_name|default:request.user.username }}</span>
+        </div>
+
     </div>
 
     <div class="receipt-footer">
@@ -82,6 +93,7 @@
         <a href="/sale/record/" class="btn btn-new">New Sale</a>
         <a href="/dashboard/" class="btn btn-home">Dashboard</a>
     </div>
+
 </div>
 </body>
 </html>

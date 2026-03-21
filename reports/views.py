@@ -252,3 +252,96 @@ def settings_page(request):
                 messages.success(request, 'Password changed successfully!')
 
     return render(request, 'reports/settings.html')
+
+
+@login_required
+def add_category(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            Category.objects.create(name=name)
+            messages.success(request, f'Category "{name}" added!')
+    return redirect('add_product')
+
+
+@login_required
+def delete_category(request, category_id):
+    from inventory.models import Category
+    cat = get_object_or_404(Category, id=category_id)
+    if request.method == 'POST':
+        cat.delete()
+        messages.success(request, 'Category deleted!')
+    return redirect('add_product')
+
+
+@login_required
+def add_supplier(request):
+    if request.method == 'POST':
+        Supplier.objects.create(
+            name=request.POST.get('name'),
+            phone=request.POST.get('phone', ''),
+            email=request.POST.get('email', ''),
+        )
+        messages.success(request, f'Supplier "{request.POST.get("name")}" added!')
+    return redirect('add_product')
+
+@login_required
+def add_product(request):
+    categories = Category.objects.all()
+    suppliers = Supplier.objects.all()
+
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'add_product':
+            name = request.POST.get('name')
+            category_id = request.POST.get('category')
+            supplier_id = request.POST.get('supplier')
+            price = request.POST.get('price')
+            stock_quantity = request.POST.get('stock_quantity')
+            reorder_level = request.POST.get('reorder_level', 5)
+            Product.objects.create(
+                name=name,
+                category_id=category_id if category_id else None,
+                supplier_id=supplier_id if supplier_id else None,
+                price=price,
+                stock_quantity=stock_quantity,
+                reorder_level=reorder_level,
+            )
+            messages.success(request, f'Product "{name}" added successfully!')
+
+        elif form_type == 'add_category':
+            name = request.POST.get('name')
+            if name:
+                Category.objects.create(name=name)
+                messages.success(request, f'Category "{name}" added!')
+            else:
+                messages.error(request, 'Category name cannot be empty!')
+
+        elif form_type == 'add_supplier':
+            name = request.POST.get('name')
+            if name:
+                Supplier.objects.create(
+                    name=name,
+                    phone=request.POST.get('phone', ''),
+                    email=request.POST.get('email', ''),
+                )
+                messages.success(request, f'Supplier "{name}" added!')
+            else:
+                messages.error(request, 'Supplier name cannot be empty!')
+
+        return redirect('add_product')
+
+    return render(request, 'reports/add_product.html', {
+        'categories': categories,
+        'suppliers': suppliers,
+    })
+
+@login_required
+def delete_supplier(request, supplier_id):
+    from inventory.models import Supplier
+    sup = get_object_or_404(Supplier, id=supplier_id)
+    if request.method == 'POST':
+        sup.delete()
+        messages.success(request, 'Supplier deleted!')
+    return redirect('add_product')

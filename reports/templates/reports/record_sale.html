@@ -7,14 +7,14 @@
         body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; }
         .sidebar { width: 220px; min-height: 100vh; background: #1a1a2e; position: fixed; top: 0; left: 0; }
         .sidebar-logo { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .sidebar-logo .icon { width: 52px; height: 52px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 8px; }
+        .sidebar-logo .icon { width: 52px; height: 52px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 8px; }
         .sidebar-logo h2 { color: white; font-size: 14px; }
         .sidebar-logo p { color: #aaa; font-size: 12px; margin-top: 2px; }
         .sidebar-menu { padding: 16px 0; }
         .menu-label { color: #555; font-size: 11px; padding: 10px 20px 4px; text-transform: uppercase; letter-spacing: 1px; }
         .menu-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; color: #bbb; text-decoration: none; font-size: 14px; }
         .menu-item:hover, .menu-item.active { background: #2c7be5; color: white; }
-        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 16px; }
         .sidebar-footer a { color: #ff6b6b; text-decoration: none; font-size: 13px; }
         .main { margin-left: 220px; flex: 1; }
         .topbar { background: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
@@ -28,10 +28,15 @@
         select, input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
         select:focus, input:focus { outline: none; border-color: #2c7be5; }
         .stock-info { font-size: 12px; color: #888; margin-top: 6px; }
-        .price-preview { background: #f0f2f5; border-radius: 6px; padding: 14px; margin-top: 20px; display: flex; justify-content: space-between; }
-        .price-preview span { font-size: 13px; color: #666; }
-        .price-preview strong { font-size: 20px; color: #2c7be5; }
-        .btn-submit { width: 100%; padding: 12px; background: #20c997; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .preview-box { background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 20px; border: 1px solid #eee; }
+        .preview-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; }
+        .preview-row .plabel { color: #888; }
+        .preview-row .pvalue { font-weight: bold; color: #333; }
+        .preview-divider { border: none; border-top: 1px dashed #ddd; margin: 8px 0; }
+        .preview-total { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+        .preview-total .tlabel { font-size: 15px; font-weight: bold; color: #333; }
+        .preview-total .tamount { font-size: 24px; font-weight: bold; color: #2c7be5; }
+        .btn-submit { width: 100%; padding: 13px; background: #20c997; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .btn-submit:hover { background: #17a589; }
         .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
         .msg.error { background: #f8d7da; color: #721c24; }
@@ -39,6 +44,7 @@
     </style>
 </head>
 <body>
+
 <div class="sidebar">
     <div class="sidebar-logo">
         <div class="icon">H</div>
@@ -56,6 +62,7 @@
         <a href="/sales/filter/" class="menu-item">Filter Sales</a>
         <div class="menu-label">Reports</div>
         <a href="/report/print/" class="menu-item">Print Report</a>
+        <a href="/export/excel/" class="menu-item">Export to Excel</a>
         <div class="menu-label">System</div>
         <a href="/settings/" class="menu-item">Settings</a>
     </div>
@@ -70,6 +77,7 @@
         <a href="/dashboard/" class="back">Back to Dashboard</a>
     </div>
     <div class="content">
+
         {% if messages %}
             {% for message in messages %}
                 <div class="msg error">{{ message }}</div>
@@ -81,27 +89,53 @@
             <div class="card-body">
                 <form method="POST" id="sale-form">
                     {% csrf_token %}
+
                     <label>Select Product</label>
                     <select name="product" id="product-select" onchange="updatePreview()">
                         {% for product in products %}
                         <option value="{{ product.id }}"
                                 data-price="{{ product.price }}"
-                                data-stock="{{ product.stock_quantity }}">
+                                data-stock="{{ product.stock_quantity }}"
+                                data-category="{{ product.category }}">
                             {{ product.name }} — KSh {{ product.price }}
                         </option>
                         {% endfor %}
                     </select>
-                    <div class="stock-info" id="stock-info">Available stock: loading...</div>
+                    <div class="stock-info" id="stock-info">Select a product to see stock</div>
 
                     <label>Quantity</label>
                     <input type="number" name="quantity" id="quantity" min="1" value="1" oninput="updatePreview()" required>
 
-                    <div class="price-preview">
-                        <span>Total Amount</span>
-                        <strong id="total-preview">KSh 0.00</strong>
+                    <!-- Live preview box -->
+                    <div class="preview-box">
+                        <div class="preview-row">
+                            <span class="plabel">Product</span>
+                            <span class="pvalue" id="preview-name">-</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="plabel">Category</span>
+                            <span class="pvalue" id="preview-category">-</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="plabel">Unit Price</span>
+                            <span class="pvalue" id="preview-price">KSh 0.00</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="plabel">Quantity</span>
+                            <span class="pvalue" id="preview-qty">0</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="plabel">Served by</span>
+                            <span class="pvalue" style="color:#2c7be5;">{{ request.user.username }}</span>
+                        </div>
+                        <hr class="preview-divider">
+                        <div class="preview-total">
+                            <span class="tlabel">Total Amount</span>
+                            <span class="tamount" id="preview-total">KSh 0.00</span>
+                        </div>
                     </div>
 
-                    <button type="submit" class="btn-submit">Record Sale & Print Receipt</button>
+                    <button type="submit" class="btn-submit">Record Sale and Print Receipt</button>
                 </form>
             </div>
         </div>
@@ -112,10 +146,18 @@
     function updatePreview() {
         const select = document.getElementById('product-select');
         const qty = parseInt(document.getElementById('quantity').value) || 0;
-        const price = parseFloat(select.options[select.selectedIndex].dataset.price) || 0;
-        const stock = select.options[select.selectedIndex].dataset.stock;
+        const selected = select.options[select.selectedIndex];
+        const price = parseFloat(selected.dataset.price) || 0;
+        const stock = selected.dataset.stock;
+        const category = selected.dataset.category;
+        const name = selected.text.split(' —')[0];
+
         document.getElementById('stock-info').textContent = 'Available stock: ' + stock + ' units';
-        document.getElementById('total-preview').textContent = 'KSh ' + (price * qty).toLocaleString('en-KE', {minimumFractionDigits: 2});
+        document.getElementById('preview-name').textContent = name;
+        document.getElementById('preview-category').textContent = category || '-';
+        document.getElementById('preview-price').textContent = 'KSh ' + price.toLocaleString('en-KE', {minimumFractionDigits: 2});
+        document.getElementById('preview-qty').textContent = qty;
+        document.getElementById('preview-total').textContent = 'KSh ' + (price * qty).toLocaleString('en-KE', {minimumFractionDigits: 2});
     }
     updatePreview();
 </script>
