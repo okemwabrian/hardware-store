@@ -5,7 +5,7 @@ from django.db.models import Sum, F, Count
 from django.db.models.functions import TruncDate
 from datetime import date
 from inventory.models import Product, Category, Supplier
-from sales.models import Sale
+from sales.models import Sale, Receipt
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from django.http import HttpResponse
