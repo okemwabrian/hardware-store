@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Sum, F, Count
@@ -7,7 +8,7 @@ from datetime import date
 from inventory.models import Product, Category, Supplier
 from sales.models import Sale
 
-
+@login_required
 def dashboard(request):
     total_products = Product.objects.count()
     low_stock_items = Product.objects.filter(stock_quantity__lte=F('reorder_level'))
@@ -61,7 +62,7 @@ def dashboard(request):
     }
     return render(request, 'reports/dashboard.html', context)
 
-
+@login_required
 def search_products(request):
     query = request.GET.get('q', '')
     results = Product.objects.filter(
@@ -72,7 +73,7 @@ def search_products(request):
         'results': results,
     })
 
-
+@login_required
 def restock_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if request.method == 'POST':
@@ -84,7 +85,7 @@ def restock_product(request, product_id):
         return redirect('dashboard')
     return render(request, 'reports/restock.html', {'product': product})
 
-
+@login_required
 def add_product(request):
     categories = Category.objects.all()
     suppliers = Supplier.objects.all()
@@ -103,7 +104,7 @@ def add_product(request):
         'categories': categories, 'suppliers': suppliers
     })
 
-
+@login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     categories = Category.objects.all()
@@ -122,7 +123,7 @@ def edit_product(request, product_id):
         'product': product, 'categories': categories, 'suppliers': suppliers
     })
 
-
+@login_required
 def delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     if request.method == 'POST':
@@ -131,7 +132,7 @@ def delete_product(request, product_id):
         messages.success(request, f'"{name}" deleted!')
     return redirect('dashboard')
 
-
+@login_required
 def record_sale(request):
     products = Product.objects.all()
     if request.method == 'POST':
@@ -149,7 +150,7 @@ def record_sale(request):
         return redirect('dashboard')
     return render(request, 'reports/record_sale.html', {'products': products})
 
-
+@login_required
 def filter_sales(request):
     sales = Sale.objects.all().order_by('-date')
     products = Product.objects.all()
@@ -179,7 +180,7 @@ def filter_sales(request):
         'selected_product': product_id or '',
     })
 
-
+@login_required
 def print_report(request):
     today = date.today()
     date_from = request.GET.get('date_from', str(today))

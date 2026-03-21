@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login — Hardware Store</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-card { background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { font-size: 28px; color: #1a1a2e; }
+        .logo p { color: #888; font-size: 14px; margin-top: 6px; }
+        label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; margin-top: 16px; }
+        input { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; }
+        input:focus { outline: none; border-color: #2c7be5; }
+        button { width: 100%; padding: 12px; background: #2c7be5; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 24px; font-weight: bold; }
+        button:hover { background: #1a68d1; }
+        .error { background: #f8d7da; color: #721c24; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">
+            <h1>🔧 Hardware Store</h1>
+            <p>Sign in to your dashboard</p>
+        </div>
+
+        {% if form.errors %}
+            <div class="error">❌ Incorrect username or password. Please try again.</div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <label>Username</label>
+            <input type="text" name="username" autofocus placeholder="Enter username">
+
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter password">
+
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</body>
+</html>
