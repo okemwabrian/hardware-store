@@ -142,14 +142,21 @@ def record_sale(request):
 
         if quantity <= 0:
             messages.error(request, 'Quantity must be greater than 0!')
+            return redirect('record_sale')
         elif quantity > product.stock_quantity:
             messages.error(request, f'Not enough stock! Only {product.stock_quantity} units available.')
+            return redirect('record_sale')
         else:
-            Sale.objects.create(product=product, quantity_sold=quantity)
-            messages.success(request, f'Sale recorded — {quantity} x {product.name}!')
-        return redirect('dashboard')
+            sale = Sale.objects.create(product=product, quantity_sold=quantity)
+            return redirect('receipt', sale_id=sale.id)
+
     return render(request, 'reports/record_sale.html', {'products': products})
 
+
+@login_required
+def receipt(request, sale_id):
+    sale = get_object_or_404(Sale, id=sale_id)
+    return render(request, 'reports/receipt.html', {'sale': sale})
 @login_required
 def filter_sales(request):
     sales = Sale.objects.all().order_by('-date')
@@ -221,3 +228,27 @@ def print_report(request):
         'date_from': date_from,
         'date_to': date_to,
     })
+@login_required
+def settings_page(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'change_password':
+            from django.contrib.auth import update_session_auth_hash
+            old_password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+
+            if not request.user.check_password(old_password):
+                messages.error(request, 'Current password is incorrect.')
+            elif new_password != confirm_password:
+                messages.error(request, 'New passwords do not match.')
+            elif len(new_password) < 6:
+                messages.error(request, 'Password must be at least 6 characters.')
+            else:
+                request.user.set_password(new_password)
+                request.user.save()
+                update_session_auth_hash(request, request.user)
+                messages.success(request, 'Password changed successfully!')
+
+    return render(request, 'reports/settings.html')

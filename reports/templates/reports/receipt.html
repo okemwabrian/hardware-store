@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipt {{ sale.receipt_number }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: flex-start; padding: 40px 20px; min-height: 100vh; }
+        .receipt { background: white; width: 380px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+        .receipt-header { background: #1a1a2e; color: white; text-align: center; padding: 24px 20px; }
+        .receipt-header h2 { font-size: 20px; margin-bottom: 4px; }
+        .receipt-header p { font-size: 12px; color: #aaa; }
+        .receipt-number { background: #2c7be5; color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: bold; letter-spacing: 2px; }
+        .receipt-body { padding: 24px; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+        .receipt-row:last-child { border-bottom: none; }
+        .receipt-row .label { color: #888; }
+        .receipt-row .value { font-weight: bold; color: #333; }
+        .receipt-total { background: #f0f2f5; border-radius: 6px; padding: 16px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .receipt-total .label { font-size: 15px; color: #555; font-weight: bold; }
+        .receipt-total .amount { font-size: 24px; color: #2c7be5; font-weight: bold; }
+        .receipt-footer { text-align: center; padding: 16px; color: #aaa; font-size: 12px; border-top: 1px dashed #eee; }
+        .btn-row { display: flex; gap: 10px; padding: 16px 24px; border-top: 1px solid #f0f0f0; }
+        .btn { flex: 1; padding: 10px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; border: none; cursor: pointer; text-align: center; }
+        .btn-print { background: #2c7be5; color: white; }
+        .btn-new { background: #20c997; color: white; }
+        .btn-home { background: #6f42c1; color: white; }
+        .btn:hover { opacity: 0.85; }
+        @media print {
+            body { background: white; padding: 0; }
+            .receipt { box-shadow: none; border-radius: 0; width: 100%; }
+            .btn-row { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="receipt">
+    <div class="receipt-header">
+        <h2>Hardware Store</h2>
+        <p>Management System</p>
+        <p style="margin-top:8px; font-size:11px;">{{ sale.date|date:"d M Y, H:i" }}</p>
+    </div>
+
+    <div class="receipt-number">
+        RECEIPT NO: {{ sale.receipt_number }}
+    </div>
+
+    <div class="receipt-body">
+        <div class="receipt-row">
+            <span class="label">Product</span>
+            <span class="value">{{ sale.product.name }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="label">Category</span>
+            <span class="value">{{ sale.product.category }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="label">Unit Price</span>
+            <span class="value">KSh {{ sale.product.price }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="label">Quantity</span>
+            <span class="value">{{ sale.quantity_sold }}</span>
+        </div>
+        <div class="receipt-row">
+            <span class="label">Served by</span>
+            <span class="value">{{ request.user.username }}</span>
+        </div>
+
+        <div class="receipt-total">
+            <span class="label">TOTAL</span>
+            <span class="amount">KSh {{ sale.total_price }}</span>
+        </div>
+    </div>
+
+    <div class="receipt-footer">
+        Thank you for your purchase!<br>
+        Please come again.
+    </div>
+
+    <div class="btn-row">
+        <button onclick="window.print()" class="btn btn-print">Print</button>
+        <a href="/sale/record/" class="btn btn-new">New Sale</a>
+        <a href="/dashboard/" class="btn btn-home">Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

@@ -4,214 +4,267 @@
     <title>Hardware Store</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; }
 
-        /* Top navbar */
-        .navbar { background: #1a1a2e; padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .navbar h1 { color: white; font-size: 20px; }
-        .navbar a { color: #aaa; text-decoration: none; font-size: 14px; }
-        .navbar a:hover { color: white; }
+        /* Sidebar */
+        .sidebar { width: 220px; min-height: 100vh; background: #1a1a2e; position: fixed; top: 0; left: 0; }
+        .sidebar-logo { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .sidebar-logo .icon { width: 52px; height: 52px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 8px; }
+        .sidebar-logo h2 { color: white; font-size: 14px; }
+        .sidebar-logo p { color: #aaa; font-size: 12px; margin-top: 2px; }
+        .sidebar-menu { padding: 16px 0; }
+        .menu-label { color: #555; font-size: 11px; padding: 10px 20px 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .menu-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; color: #bbb; text-decoration: none; font-size: 14px; transition: all 0.2s; }
+        .menu-item:hover, .menu-item.active { background: #2c7be5; color: white; }
+        .menu-item span { font-size: 16px; }
+        .sidebar-footer { position: absolute; bottom: 0; width: 100%; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer a { color: #ff6b6b; text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 8px; }
 
         /* Main content */
-        .container { padding: 24px 30px; }
+        .main { margin-left: 220px; flex: 1; }
+
+        /* Top bar */
+        .topbar { background: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); position: sticky; top: 0; z-index: 100; }
+        .topbar h3 { color: #333; font-size: 18px; }
+        .topbar .user { display: flex; align-items: center; gap: 10px; color: #555; font-size: 14px; }
+        .topbar .user .avatar { width: 34px; height: 34px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; }
+
+        .content { padding: 24px; }
 
         /* Messages */
         .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
         .msg.success { background: #d4edda; color: #155724; }
         .msg.error { background: #f8d7da; color: #721c24; }
 
-        /* Action buttons row */
-        .actions { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
-        .btn { padding: 9px 18px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
-        .btn-blue { background: #2c7be5; color: white; }
-        .btn-green { background: #28a745; color: white; }
-        .btn-teal { background: #20c997; color: white; }
-        .btn-purple { background: #6f42c1; color: white; }
-        .btn-orange { background: #fd7e14; color: white; }
-        .btn-red { background: #dc3545; color: white; }
-        .btn:hover { opacity: 0.85; }
-
         /* Stat cards */
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: white; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-        .stat-card .number { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
-        .stat-card .label { font-size: 13px; color: #888; }
-        .blue { color: #2c7be5; }
-        .green { color: #28a745; }
-        .orange { color: #fd7e14; }
-        .red { color: #dc3545; }
+        .stat-card { border-radius: 8px; padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        .stat-card.teal { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .stat-card.red { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
+        .stat-card.amber { background: linear-gradient(135deg, #f7971e, #ffd200); }
+        .stat-card.blue { background: linear-gradient(135deg, #2c7be5, #6f42c1); }
+        .stat-card .stat-info h2 { font-size: 32px; font-weight: bold; }
+        .stat-card .stat-info p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        .stat-card .stat-icon { font-size: 40px; opacity: 0.5; }
+        .stat-footer { background: rgba(0,0,0,0.15); margin: 16px -20px -20px; padding: 8px 20px; font-size: 12px; border-radius: 0 0 8px 8px; }
+        .stat-footer a { color: white; text-decoration: none; }
 
-        /* Two column layout */
+        /* Two column grid */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
 
         /* Panels */
-        .panel { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
-        .panel-header { padding: 14px 20px; font-weight: bold; font-size: 15px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .panel { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+        .panel-header { padding: 14px 20px; font-weight: bold; font-size: 14px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .panel-header.blue { background: #2c7be5; }
+        .panel-header.red { background: #cb2d3e; }
+        .panel-header.teal { background: #11998e; }
+        .panel-header.purple { background: #6f42c1; }
+        .panel-header.amber { background: #f7971e; }
         .panel-body { padding: 0; }
 
         /* Tables */
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #f8f9fa; color: #555; padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #555; padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; font-size: 12px; }
         td { padding: 10px 16px; border-bottom: 1px solid #f5f5f5; color: #333; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #fafafa; }
 
-        /* Status badges */
+        /* Badges */
         .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
         .badge-red { background: #fde8e8; color: #dc3545; }
         .badge-green { background: #e8f5e9; color: #28a745; }
+        .badge-blue { background: #e8f0fe; color: #2c7be5; }
 
-        /* Chart panel */
-        .chart-panel { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 24px; }
-        .chart-panel h3 { font-size: 15px; color: #333; margin-bottom: 16px; }
+        /* Buttons */
+        .btn { padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
+        .btn-blue { background: #2c7be5; color: white; }
+        .btn-orange { background: #fd7e14; color: white; }
+        .btn-red { background: #dc3545; color: white; }
+        .btn-green { background: #28a745; color: white; }
+        .btn:hover { opacity: 0.85; }
 
-        /* Full width panel */
-        .full-panel { margin-bottom: 24px; }
-
-        /* Empty state */
         .empty { padding: 20px; text-align: center; color: #aaa; font-size: 13px; }
-
-        /* Logout link */
-        .logout { color: #ff6b6b !important; }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <h1>🔧 Hardware Store</h1>
-    <div style="display:flex; gap:20px; align-items:center;">
-        <span style="color:#aaa; font-size:14px;">👤 {{ request.user.username }}</span>
-        <a href="/accounts/logout/" class="logout">Logout</a>
-    </div>
-</nav>
-
-<div class="container">
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="msg {% if 'error' in message.tags %}error{% else %}success{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <!-- Action buttons -->
-    <div class="actions">
-        <a href="/product/add/" class="btn btn-green">+ Add Product</a>
-        <a href="/sale/record/" class="btn btn-teal">💰 Record Sale</a>
-        <a href="/sales/filter/" class="btn btn-purple">📊 Sales Filter</a>
-        <a href="/report/print/" class="btn btn-orange">🖨️ Print Report</a>
-        <a href="/search/" class="btn btn-blue">🔍 Search</a>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <div class="icon"></div>
+        <h2>Hardware Store</h2>
+        <p>Management System</p>
     </div>
 
-    <!-- Stat cards -->
-    <div class="stats">
-        <div class="stat-card">
-            <div class="number orange">KSh {{ today_revenue }}</div>
-            <div class="label">Today's Revenue</div>
-        </div>
-        <div class="stat-card">
-            <div class="number blue">{{ today_items_sold }}</div>
-            <div class="label">Items Sold Today</div>
-        </div>
-        <div class="stat-card">
-            <div class="number green">KSh {{ total_sales_value }}</div>
-            <div class="label">All Time Revenue</div>
-        </div>
-        <div class="stat-card">
-            <div class="number red">{{ low_stock_items.count }}</div>
-            <div class="label">Low Stock Alerts</div>
+    <div class="sidebar-menu">
+        <div class="menu-label">Main</div>
+        <a href="/dashboard/" class="menu-item active"><span></span> Dashboard</a>
+
+        <div class="menu-label">Inventory</div>
+        <a href="/product/add/" class="menu-item"><span></span> Add Product</a>
+        <a href="/search/" class="menu-item"><span></span> Search Products</a>
+
+        <div class="menu-label">Sales</div>
+        <a href="/sale/record/" class="menu-item"><span></span> Record Sale</a>
+        <a href="/sales/filter/" class="menu-item"><span></span> Filter Sales</a>
+
+        <div class="menu-label">Reports</div>
+        <a href="/report/print/" class="menu-item"><span></span> Print Report</a>
+    </div>
+
+    <div class="sidebar-footer">
+        <a href="/accounts/logout/"> Logout — {{ request.user.username }}</a>
+    </div>
+</div>
+
+<!-- Main content -->
+<div class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+        <h3>Admin Dashboard</h3>
+        <div class="user">
+            <div class="avatar">{{ request.user.username|first|upper }}</div>
+            <span>{{ request.user.username }}</span>
         </div>
     </div>
 
-    <!-- Chart + Low stock side by side -->
-    <div class="grid-2">
-        <div class="chart-panel">
-            <h3>📈 Revenue — Last 14 Days</h3>
-            <canvas id="salesChart" height="200"></canvas>
+    <div class="content">
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="msg {% if 'error' in message.tags %}error{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Stat cards -->
+        <div class="stats">
+            <div class="stat-card teal">
+                <div class="stat-info">
+                    <h2>{{ total_products }}</h2>
+                    <p>Total Products</p>
+                    <div class="stat-footer"><a href="/search/">More info →</a></div>
+                </div>
+                <div class="stat-icon"></div>
+            </div>
+            <div class="stat-card red">
+                <div class="stat-info">
+                    <h2>{{ low_stock_items.count }}</h2>
+                    <p>Low Stock Alerts</p>
+                    <div class="stat-footer"><a href="/dashboard/#low-stock">More info →</a></div>
+                </div>
+                <div class="stat-icon"></div>
+            </div>
+            <div class="stat-card amber">
+                <div class="stat-info">
+                    <h2>KSh {{ today_revenue }}</h2>
+                    <p>Today's Revenue</p>
+                    <div class="stat-footer"><a href="/sales/filter/">More info →</a></div>
+                </div>
+                <div class="stat-icon"></div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-info">
+                    <h2>KSh {{ total_sales_value }}</h2>
+                    <p>All Time Revenue</p>
+                    <div class="stat-footer"><a href="/report/print/">More info →</a></div>
+                </div>
+                <div class="stat-icon"></div>
+            </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                ⚠️ Low Stock Items
+        <!-- Chart + Low stock -->
+        <div class="grid-2">
+            <div class="panel">
+                <div class="panel-header blue">
+                     Revenue — Last 14 Days
+                </div>
+                <div style="padding: 20px;">
+                    <canvas id="salesChart" height="220"></canvas>
+                </div>
             </div>
-            <div class="panel-body">
-                <table>
-                    <tr>
-                        <th>Product</th><th>Stock</th><th>Action</th>
-                    </tr>
-                    {% for item in low_stock_items %}
-                    <tr>
-                        <td><span class="badge badge-red">{{ item.name }}</span></td>
-                        <td>{{ item.stock_quantity }}</td>
-                        <td><a href="/restock/{{ item.id }}/" class="btn btn-blue" style="padding:4px 10px; font-size:12px;">Restock</a></td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="3" class="empty">✅ All items sufficiently stocked</td></tr>
-                    {% endfor %}
-                </table>
+
+            <div class="panel" id="low-stock">
+                <div class="panel-header red">
+                    ⚠️ Low Stock Items
+                </div>
+                <div class="panel-body">
+                    <table>
+                        <tr><th>Product</th><th>Stock</th><th>Action</th></tr>
+                        {% for item in low_stock_items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td><span class="badge badge-red">{{ item.stock_quantity }}</span></td>
+                            <td><a href="/restock/{{ item.id }}/" class="btn btn-blue">Restock</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="empty">✅ All items sufficiently stocked</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- Products + Recent Sales -->
+        <div class="grid-2">
+            <div class="panel">
+                <div class="panel-header teal">
+                    📦 All Products
+                    <a href="/product/add/" class="btn btn-green" style="font-size:11px;">+ Add</a>
+                </div>
+                <div class="panel-body">
+                    <table>
+                        <tr><th>Name</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
+                        {% for product in all_products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>KSh {{ product.price }}</td>
+                            <td>
+                                {% if product.is_low_stock %}
+                                    <span class="badge badge-red">{{ product.stock_quantity }}</span>
+                                {% else %}
+                                    <span class="badge badge-green">{{ product.stock_quantity }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="display:flex; gap:4px;">
+                                <a href="/product/edit/{{ product.id }}/" class="btn btn-orange">Edit</a>
+                                <form method="POST" action="/product/delete/{{ product.id }}/" style="display:inline;" onsubmit="return confirm('Delete {{ product.name }}?')">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-red">Del</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header purple">
+                    🧾 Recent Sales
+                    <a href="/sale/record/" class="btn btn-green" style="font-size:11px;">+ Sale</a>
+                </div>
+                <div class="panel-body">
+                    <table>
+                        <tr><th>Product</th><th>Qty</th><th>Total</th><th>Time</th></tr>
+                        {% for sale in recent_sales %}
+                        <tr>
+                            <td>{{ sale.product.name }}</td>
+                            <td><span class="badge badge-blue">{{ sale.quantity_sold }}</span></td>
+                            <td>KSh {{ sale.total_price }}</td>
+                            <td>{{ sale.date|date:"d M, H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="empty">No sales yet</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
-
-    <!-- Products + Recent Sales side by side -->
-    <div class="grid-2">
-        <div class="panel full-panel">
-            <div class="panel-header">
-                📦 All Products
-                <a href="/product/add/" class="btn btn-green" style="padding:5px 12px; font-size:12px;">+ Add</a>
-            </div>
-            <div class="panel-body">
-                <table>
-                    <tr>
-                        <th>Name</th><th>Price</th><th>Stock</th><th>Actions</th>
-                    </tr>
-                    {% for product in all_products %}
-                    <tr>
-                        <td>{{ product.name }}</td>
-                        <td>KSh {{ product.price }}</td>
-                        <td>
-                            {% if product.is_low_stock %}
-                                <span class="badge badge-red">{{ product.stock_quantity }}</span>
-                            {% else %}
-                                <span class="badge badge-green">{{ product.stock_quantity }}</span>
-                            {% endif %}
-                        </td>
-                        <td style="display:flex; gap:6px;">
-                            <a href="/product/edit/{{ product.id }}/" class="btn btn-orange" style="padding:4px 10px; font-size:12px;">Edit</a>
-                            <form method="POST" action="/product/delete/{{ product.id }}/" style="display:inline;" onsubmit="return confirm('Delete {{ product.name }}?')">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-red" style="padding:4px 10px; font-size:12px;">Del</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-
-        <div class="panel full-panel">
-            <div class="panel-header">🧾 Recent Sales</div>
-            <div class="panel-body">
-                <table>
-                    <tr>
-                        <th>Product</th><th>Qty</th><th>Total</th><th>Date</th>
-                    </tr>
-                    {% for sale in recent_sales %}
-                    <tr>
-                        <td>{{ sale.product.name }}</td>
-                        <td>{{ sale.quantity_sold }}</td>
-                        <td>KSh {{ sale.total_price }}</td>
-                        <td>{{ sale.date|date:"d M, H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="4" class="empty">No sales yet</td></tr>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>

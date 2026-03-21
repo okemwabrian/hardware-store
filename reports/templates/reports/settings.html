@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Record Sale</title>
+    <title>Settings</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; }
@@ -20,22 +20,23 @@
         .topbar { background: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
         .topbar h3 { color: #333; font-size: 18px; }
         .content { padding: 24px; max-width: 600px; }
-        .card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
-        .card-header { background: #20c997; color: white; padding: 14px 20px; font-weight: bold; font-size: 15px; }
+        .card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 20px; }
+        .card-header { padding: 14px 20px; font-weight: bold; font-size: 15px; color: white; }
+        .card-header.blue { background: #2c7be5; }
         .card-body { padding: 24px; }
         label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; margin-top: 16px; }
         label:first-child { margin-top: 0; }
-        select, input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        select:focus, input:focus { outline: none; border-color: #2c7be5; }
-        .stock-info { font-size: 12px; color: #888; margin-top: 6px; }
-        .price-preview { background: #f0f2f5; border-radius: 6px; padding: 14px; margin-top: 20px; display: flex; justify-content: space-between; }
-        .price-preview span { font-size: 13px; color: #666; }
-        .price-preview strong { font-size: 20px; color: #2c7be5; }
-        .btn-submit { width: 100%; padding: 12px; background: #20c997; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-submit:hover { background: #17a589; }
+        input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        input:focus { outline: none; border-color: #2c7be5; }
+        button { padding: 10px 24px; background: #2c7be5; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #1a68d1; }
         .msg { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 14px; }
+        .msg.success { background: #d4edda; color: #155724; }
         .msg.error { background: #f8d7da; color: #721c24; }
-        a.back { color: #2c7be5; text-decoration: none; font-size: 13px; }
+        .user-info { display: flex; align-items: center; gap: 16px; padding: 16px 0; }
+        .avatar-lg { width: 60px; height: 60px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; }
+        .user-info h3 { color: #333; font-size: 18px; }
+        .user-info p { color: #888; font-size: 13px; margin-top: 3px; }
     </style>
 </head>
 <body>
@@ -52,12 +53,12 @@
         <a href="/product/add/" class="menu-item">Add Product</a>
         <a href="/search/" class="menu-item">Search Products</a>
         <div class="menu-label">Sales</div>
-        <a href="/sale/record/" class="menu-item active">Record Sale</a>
+        <a href="/sale/record/" class="menu-item">Record Sale</a>
         <a href="/sales/filter/" class="menu-item">Filter Sales</a>
         <div class="menu-label">Reports</div>
         <a href="/report/print/" class="menu-item">Print Report</a>
         <div class="menu-label">System</div>
-        <a href="/settings/" class="menu-item">Settings</a>
+        <a href="/settings/" class="menu-item active">Settings</a>
     </div>
     <div class="sidebar-footer">
         <a href="/accounts/logout/">Logout — {{ request.user.username }}</a>
@@ -66,58 +67,49 @@
 
 <div class="main">
     <div class="topbar">
-        <h3>Record Sale</h3>
-        <a href="/dashboard/" class="back">Back to Dashboard</a>
+        <h3>Settings</h3>
     </div>
     <div class="content">
         {% if messages %}
             {% for message in messages %}
-                <div class="msg error">{{ message }}</div>
+                <div class="msg {% if 'error' in message.tags %}error{% else %}success{% endif %}">{{ message }}</div>
             {% endfor %}
         {% endif %}
 
+        <!-- Account info -->
         <div class="card">
-            <div class="card-header">New Sale</div>
+            <div class="card-header blue">Account Information</div>
             <div class="card-body">
-                <form method="POST" id="sale-form">
-                    {% csrf_token %}
-                    <label>Select Product</label>
-                    <select name="product" id="product-select" onchange="updatePreview()">
-                        {% for product in products %}
-                        <option value="{{ product.id }}"
-                                data-price="{{ product.price }}"
-                                data-stock="{{ product.stock_quantity }}">
-                            {{ product.name }} — KSh {{ product.price }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <div class="stock-info" id="stock-info">Available stock: loading...</div>
-
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" id="quantity" min="1" value="1" oninput="updatePreview()" required>
-
-                    <div class="price-preview">
-                        <span>Total Amount</span>
-                        <strong id="total-preview">KSh 0.00</strong>
+                <div class="user-info">
+                    <div class="avatar-lg">{{ request.user.username|first|upper }}</div>
+                    <div>
+                        <h3>{{ request.user.username }}</h3>
+                        <p>{{ request.user.email|default:"No email set" }}</p>
+                        <p>Last login: {{ request.user.last_login|date:"d M Y, H:i" }}</p>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <button type="submit" class="btn-submit">Record Sale & Print Receipt</button>
+        <!-- Change password -->
+        <div class="card">
+            <div class="card-header blue">Change Password</div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_password">
+                    <label>Current Password</label>
+                    <input type="password" name="old_password" placeholder="Enter current password" required>
+                    <label>New Password</label>
+                    <input type="password" name="new_password" placeholder="Enter new password" required>
+                    <label>Confirm New Password</label>
+                    <input type="password" name="confirm_password" placeholder="Confirm new password" required>
+                    <button type="submit">Update Password</button>
                 </form>
             </div>
         </div>
+
     </div>
 </div>
-
-<script>
-    function updatePreview() {
-        const select = document.getElementById('product-select');
-        const qty = parseInt(document.getElementById('quantity').value) || 0;
-        const price = parseFloat(select.options[select.selectedIndex].dataset.price) || 0;
-        const stock = select.options[select.selectedIndex].dataset.stock;
-        document.getElementById('stock-info').textContent = 'Available stock: ' + stock + ' units';
-        document.getElementById('total-preview').textContent = 'KSh ' + (price * qty).toLocaleString('en-KE', {minimumFractionDigits: 2});
-    }
-    updatePreview();
-</script>
 </body>
 </html>
