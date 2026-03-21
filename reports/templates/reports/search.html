@@ -3,61 +3,175 @@
 <head>
     <title>Search Products</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-        h1 { color: #333; }
-        .search-bar { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { padding: 10px; width: 400px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-        button { padding: 10px 20px; background: #2c7be5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #1a68d1; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        th { background: #2c7be5; color: white; padding: 12px; text-align: left; }
-        td { padding: 10px 12px; border-bottom: 1px solid #eee; }
-        .low { color: red; font-weight: bold; }
-        .ok { color: green; }
-        a { color: #2c7be5; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .back { margin-bottom: 20px; display: inline-block; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; }
+        .sidebar { width: 220px; min-height: 100vh; background: #1a1a2e; position: fixed; top: 0; left: 0; overflow-y: auto; }
+        .sidebar-logo { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .sidebar-logo .icon { width: 52px; height: 52px; background: #2c7be5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; margin: 0 auto 8px; }
+        .sidebar-logo h2 { color: white; font-size: 14px; }
+        .sidebar-logo p { color: #aaa; font-size: 12px; margin-top: 2px; }
+        .sidebar-menu { padding: 16px 0; }
+        .menu-label { color: #555; font-size: 11px; padding: 10px 20px 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .menu-item { display: flex; align-items: center; gap: 10px; padding: 11px 20px; color: #bbb; text-decoration: none; font-size: 14px; }
+        .menu-item:hover, .menu-item.active { background: #2c7be5; color: white; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 16px; }
+        .sidebar-footer a { color: #ff6b6b; text-decoration: none; font-size: 13px; }
+        .main { margin-left: 220px; flex: 1; }
+        .topbar { background: white; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .topbar h3 { color: #333; font-size: 18px; }
+        .content { padding: 24px; }
+
+        .search-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 24px; }
+        .search-card h4 { font-size: 14px; color: #555; margin-bottom: 14px; font-weight: 600; }
+        .search-row { display: flex; gap: 12px; align-items: center; }
+        .search-row input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; }
+        .search-row input:focus { outline: none; border-color: #2c7be5; }
+        .btn-search { padding: 10px 28px; background: #2c7be5; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .btn-search:hover { background: #1a68d1; }
+        .btn-clear { padding: 10px 20px; background: #f8f9fa; color: #555; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; }
+
+        .results-info { font-size: 14px; color: #555; margin-bottom: 16px; }
+        .results-info strong { color: #333; }
+
+        .panel { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+        .panel-header { padding: 14px 20px; font-weight: bold; font-size: 14px; color: white; background: #2c7be5; display: flex; justify-content: space-between; align-items: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f8f9fa; color: #555; padding: 10px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; font-size: 12px; }
+        td { padding: 10px 16px; border-bottom: 1px solid #f5f5f5; color: #333; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .badge-red { background: #fde8e8; color: #dc3545; }
+        .badge-green { background: #e8f5e9; color: #28a745; }
+        .badge-blue { background: #e8f0fe; color: #2c7be5; }
+
+        .btn { padding: 5px 12px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; border: none; cursor: pointer; display: inline-block; }
+        .btn-orange { background: #fd7e14; color: white; }
+        .btn-restock { background: #2c7be5; color: white; }
+        .btn:hover { opacity: 0.85; }
+
+        .empty { padding: 40px; text-align: center; color: #aaa; font-size: 14px; }
+        .empty p { margin-bottom: 8px; }
+
+        .welcome { text-align: center; padding: 40px 20px; color: #aaa; }
+        .welcome h3 { font-size: 18px; color: #555; margin-bottom: 8px; }
+        .welcome p { font-size: 14px; }
     </style>
 </head>
 <body>
-    <a class="back" href="/dashboard/">← Back to Dashboard</a>
-    <h1>Search Products</h1>
 
-    <form method="GET" action="/search/">
-        <div class="search-bar">
-            <input type="text" name="q" value="{{ query }}" placeholder="Search by product name...">
-            <button type="submit">Search</button>
-        </div>
-    </form>
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <div class="icon">H</div>
+        <h2>Hardware Store</h2>
+        <p>Management System</p>
+    </div>
+    <div class="sidebar-menu">
+        <div class="menu-label">Main</div>
+        <a href="/dashboard/" class="menu-item">Dashboard</a>
+        <div class="menu-label">Inventory</div>
+        <a href="/product/add/" class="menu-item">Add Product</a>
+        <a href="/search/" class="menu-item active">Search Products</a>
+        <div class="menu-label">Sales</div>
+        <a href="/sale/record/" class="menu-item">Record Sale</a>
+        <a href="/sales/filter/" class="menu-item">Filter Sales</a>
+        <div class="menu-label">Reports</div>
+        <a href="/report/print/" class="menu-item">Print Report</a>
+        <a href="/export/excel/" class="menu-item">Export to Excel</a>
+        <div class="menu-label">System</div>
+        <a href="/settings/" class="menu-item">Settings</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="/accounts/logout/">Logout — {{ request.user.username }}</a>
+    </div>
+</div>
 
-    {% if query %}
-        <p>Results for <strong>"{{ query }}"</strong>: {{ results.count }} item(s) found</p>
-        <table>
-            <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Price (KSh)</th>
-                <th>Stock</th>
-                <th>Status</th>
-            </tr>
-            {% for product in results %}
-            <tr>
-                <td>{{ product.name }}</td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.price }}</td>
-                <td>{{ product.stock_quantity }}</td>
-                <td>
-                    {% if product.is_low_stock %}
-                        <span class="low">⚠️ Low Stock</span>
-                    {% else %}
-                        <span class="ok">✅ OK</span>
+<div class="main">
+    <div class="topbar">
+        <h3>Search Products</h3>
+        <a href="/dashboard/" style="color:#2c7be5; text-decoration:none; font-size:13px;">Back to Dashboard</a>
+    </div>
+
+    <div class="content">
+
+        <!-- Search form -->
+        <div class="search-card">
+            <h4>Search by product name</h4>
+            <form method="GET" action="/search/">
+                <div class="search-row">
+                    <input type="text" name="q" value="{{ query }}" placeholder="e.g. Steel Pipe, Extension Cable..." autofocus>
+                    <button type="submit" class="btn-search">Search</button>
+                    {% if query %}
+                    <a href="/search/" class="btn-clear">Clear</a>
                     {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="5">No products found.</td></tr>
-            {% endfor %}
-        </table>
-    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        {% if query %}
+            <div class="results-info">
+                Results for <strong>"{{ query }}"</strong> — {{ results.count }} item(s) found
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    Search Results
+                    <span style="font-size:12px; font-weight:normal;">{{ results.count }} product(s)</span>
+                </div>
+                <table>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Price (KSh)</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for product in results %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>{{ product.supplier }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.stock_quantity }}</td>
+                        <td>
+                            {% if product.is_low_stock %}
+                                <span class="badge badge-red">Low Stock</span>
+                            {% else %}
+                                <span class="badge badge-green">OK</span>
+                            {% endif %}
+                        </td>
+                        <td style="display:flex; gap:6px;">
+                            <a href="/product/edit/{{ product.id }}/" class="btn btn-orange">Edit</a>
+                            {% if product.is_low_stock %}
+                            <a href="/restock/{{ product.id }}/" class="btn btn-restock">Restock</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="empty">
+                            <p>No products found for "{{ query }}"</p>
+                            <p>Try a different search term</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+
+        {% else %}
+            <div class="panel">
+                <div class="panel-header">Products</div>
+                <div class="welcome">
+                    <h3>Search your inventory</h3>
+                    <p>Type a product name above to find it instantly</p>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
 </body>
 </html>
