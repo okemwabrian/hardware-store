@@ -185,6 +185,18 @@ def print_report(request):
     date_from = request.GET.get('date_from', str(today))
     date_to = request.GET.get('date_to', str(today))
 
+    # Clean the date format — force YYYY-MM-DD
+    try:
+        from datetime import datetime
+        # Handle cases where date might come in wrong format
+        if '-' not in date_from:
+            date_from = str(today)
+        if '-' not in date_to:
+            date_to = str(today)
+    except Exception:
+        date_from = str(today)
+        date_to = str(today)
+
     sales = Sale.objects.filter(
         date__date__gte=date_from,
         date__date__lte=date_to

@@ -42,24 +42,24 @@
     {% if messages %}
         {% for message in messages %}
             {% if 'error' in message.tags %}
-                <div class="error-msg">❌ {{ message }}</div>
+                <div class="error-msg"> {{ message }}</div>
             {% else %}
-                <div class="success-msg">✅ {{ message }}</div>
+                <div class="success-msg"> {{ message }}</div>
             {% endif %}
         {% endfor %}
     {% endif %}
 
     <div class="top-bar">
-        <a href="/search/" class="btn btn-blue">🔍 Search</a>
+        <a href="/search/" class="btn btn-blue"> Search</a>
         <a href="/product/add/" class="btn btn-green">+ Add Product</a>
-        <a href="/sale/record/" class="btn btn-teal">💰 Record Sale</a>
-        <a href="/sales/filter/" class="btn btn-purple">📊 Filter Sales</a>
-        <a href="/report/print/" class="btn btn-orange">🖨️ Print Report</a>
+        <a href="/sale/record/" class="btn btn-teal"> Record Sale</a>
+        <a href="/sales/filter/" class="btn btn-purple"> Filter Sales</a>
+        <a href="/report/print/" class="btn btn-orange"> Print Report</a>
     </div>
 
     <!-- Today's summary -->
     <div class="today-box">
-        <h3>📅 Today — {{ today }}</h3>
+        <h3> Today — {{ today }}</h3>
         <div class="today-stats">
             <div class="today-stat">
                 <span>KSh {{ today_revenue }}</span>
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Low stock -->
-    <h2>⚠️ Low Stock Items</h2>
+    <h2> Low Stock Items</h2>
     <table>
         <tr>
             <th>Product</th><th>Category</th><th>Stock</th><th>Reorder Level</th><th>Action</th>
@@ -103,12 +103,12 @@
             <td><a href="/restock/{{ item.id }}/" class="btn btn-blue">Restock</a></td>
         </tr>
         {% empty %}
-        <tr><td colspan="5">✅ All items are sufficiently stocked!</td></tr>
+        <tr><td colspan="5"> All items are sufficiently stocked!</td></tr>
         {% endfor %}
     </table>
 
     <!-- Daily breakdown -->
-    <h2>📅 Daily Breakdown (Last 14 Days)</h2>
+    <h2> Daily Breakdown (Last 14 Days)</h2>
     <table>
         <tr>
             <th>Date</th><th>Revenue (KSh)</th><th>Items Sold</th><th>Transactions</th><th>Action</th>
@@ -129,7 +129,7 @@
     </table>
 
     <!-- All products -->
-    <h2>📦 All Products</h2>
+    <h2> All Products</h2>
     <table>
         <tr>
             <th>Name</th><th>Category</th><th>Price (KSh)</th><th>Stock</th><th>Reorder</th><th>Actions</th>
@@ -153,7 +153,7 @@
     </table>
 
     <!-- Recent sales -->
-    <h2>🧾 Recent Sales</h2>
+    <h2> Recent Sales</h2>
     <table>
         <tr>
             <th>Product</th><th>Quantity</th><th>Total Price</th><th>Date</th>
@@ -169,7 +169,7 @@
     </table>
 
     <!-- Chart -->
-    <h2>📈 Sales Chart (Last 14 Days)</h2>
+    <h2> Sales Chart (Last 14 Days)</h2>
     <div style="background:white; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
         <canvas id="salesChart" height="100"></canvas>
     </div>
