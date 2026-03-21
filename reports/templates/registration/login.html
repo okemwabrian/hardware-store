@@ -4,40 +4,202 @@
     <title>Login — Hardware Store</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .login-card { background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo h1 { font-size: 28px; color: #1a1a2e; }
-        .logo p { color: #888; font-size: 14px; margin-top: 6px; }
-        label { font-size: 13px; color: #666; display: block; margin-bottom: 6px; margin-top: 16px; }
-        input { width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; }
-        input:focus { outline: none; border-color: #2c7be5; }
-        button { width: 100%; padding: 12px; background: #2c7be5; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; margin-top: 24px; font-weight: bold; }
-        button:hover { background: #1a68d1; }
-        .error { background: #f8d7da; color: #721c24; padding: 10px 14px; border-radius: 6px; font-size: 13px; margin-top: 16px; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            min-height: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            margin: 20px;
+        }
+
+        /* Left panel */
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, #2c7be5, #6f42c1);
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+        .login-left .brand-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+        .login-left h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .login-left p {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .feature-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Right panel */
+        .login-right {
+            width: 380px;
+            background: white;
+            padding: 48px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .login-right h2 {
+            font-size: 22px;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .login-right .subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 32px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #555;
+            display: block;
+            margin-bottom: 6px;
+            margin-top: 18px;
+            font-weight: 600;
+        }
+        label:first-of-type { margin-top: 0; }
+
+        input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #2c7be5;
+            box-shadow: 0 0 0 3px rgba(44,123,229,0.1);
+        }
+
+        .error-box {
+            background: #fde8e8;
+            color: #c0392b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border-left: 3px solid #dc3545;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #2c7be5, #6f42c1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 28px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            transition: opacity 0.2s;
+        }
+        .btn-login:hover { opacity: 0.9; }
+
+        .login-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+        }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="logo">
-            <h1> Hardware Store</h1>
-            <p>Sign in to your dashboard</p>
-        </div>
+
+<div class="login-wrapper">
+
+    <!-- Left branding panel -->
+    <div class="login-left">
+        <div class="brand-icon">H</div>
+        <h1>Hardware Store</h1>
+        <p>A complete management system for your hardware business. Track inventory, record sales and generate reports.</p>
+        <ul class="feature-list">
+            <li><span class="feature-dot"></span> Inventory management</li>
+            <li><span class="feature-dot"></span> Sales recording and receipts</li>
+            <li><span class="feature-dot"></span> Low stock alerts</li>
+            <li><span class="feature-dot"></span> Daily revenue reports</li>
+            <li><span class="feature-dot"></span> Excel export</li>
+        </ul>
+    </div>
+
+    <!-- Right login form -->
+    <div class="login-right">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to your dashboard</p>
 
         {% if form.errors %}
-            <div class="error"> Incorrect username or password. Please try again.</div>
+            <div class="error-box">Incorrect username or password. Please try again.</div>
         {% endif %}
 
         <form method="POST">
             {% csrf_token %}
             <label>Username</label>
-            <input type="text" name="username" autofocus placeholder="Enter username">
+            <input type="text" name="username" autofocus placeholder="Enter your username">
 
             <label>Password</label>
-            <input type="password" name="password" placeholder="Enter password">
+            <input type="password" name="password" placeholder="Enter your password">
 
-            <button type="submit">Sign In</button>
+            <button type="submit" class="btn-login">Sign In</button>
         </form>
+
+        <div class="login-footer">
+            Hardware Store Management System v1.0
+        </div>
     </div>
+
+</div>
+
 </body>
 </html>
