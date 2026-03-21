@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit {{ product.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        .card { background: white; padding: 30px; border-radius: 8px; max-width: 550px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        label { font-size: 14px; color: #666; display: block; margin-bottom: 5px; }
+        input, select { padding: 10px; width: 100%; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; margin-bottom: 16px; box-sizing: border-box; }
+        button { padding: 12px 24px; background: #fd7e14; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; }
+        button:hover { background: #e96c02; }
+        a { color: #2c7be5; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <a href="/dashboard/">← Back to Dashboard</a>
+    <div class="card">
+        <h1>Edit {{ product.name }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <label>Product Name</label>
+            <input type="text" name="name" value="{{ product.name }}" required>
+
+            <label>Category</label>
+            <select name="category">
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if cat.id == product.category_id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Supplier</label>
+            <select name="supplier">
+                {% for sup in suppliers %}
+                <option value="{{ sup.id }}" {% if sup.id == product.supplier_id %}selected{% endif %}>{{ sup.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Price (KSh)</label>
+            <input type="number" name="price" step="0.01" value="{{ product.price }}" required>
+
+            <label>Stock Quantity</label>
+            <input type="number" name="stock_quantity" value="{{ product.stock_quantity }}" required>
+
+            <label>Reorder Level</label>
+            <input type="number" name="reorder_level" value="{{ product.reorder_level }}" required>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html>
