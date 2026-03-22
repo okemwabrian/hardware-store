@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: hardware-store
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn hardware_store.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hardware-store-db
+          property: connectionString
+
+databases:
+  - name: hardware-store-db
+    plan: free
