@@ -8,6 +8,8 @@ class Receipt(models.Model):
     receipt_number = models.CharField(max_length=20, unique=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     served_by = models.CharField(max_length=100, blank=True)
+    customer_name = models.CharField(max_length=200, blank=True, default='Walk-in Customer')
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):
@@ -15,9 +17,12 @@ class Receipt(models.Model):
             self.receipt_number = 'RCP-' + ''.join(random.choices(string.digits, k=6))
         super().save(*args, **kwargs)
 
+    @property
+    def final_amount(self):
+        return self.total_amount - self.discount
+
     def __str__(self):
         return self.receipt_number
-
 
 class Sale(models.Model):
     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE, null=True, blank=True, related_name='items')

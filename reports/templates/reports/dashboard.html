@@ -84,6 +84,21 @@
         .empty { padding: 20px; text-align: center; color: #aaa; font-size: 13px; }
     </style>
 </head>
+<script>
+    function updateClock() {
+        const now = new Date();
+        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        document.getElementById('live-date').textContent =
+            days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+        let h = now.getHours().toString().padStart(2,'0');
+        let m = now.getMinutes().toString().padStart(2,'0');
+        let s = now.getSeconds().toString().padStart(2,'0');
+        document.getElementById('live-time').textContent = h + ':' + m + ':' + s;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
 <body>
 
 <div class="sidebar">
@@ -118,12 +133,18 @@
 
 <div class="main">
     <div class="topbar">
-        <h3>Admin Dashboard</h3>
+    <h3>Admin Dashboard</h3>
+    <div style="display:flex; align-items:center; gap:20px;">
+        <div style="text-align:right;">
+            <div style="font-size:13px; color:#555;" id="live-date"></div>
+            <div style="font-size:20px; font-weight:bold; color:#2c7be5;" id="live-time"></div>
+        </div>
         <div class="user">
             <div class="avatar">{{ request.user.username|first|upper }}</div>
             <span>{{ request.user.username }}</span>
         </div>
     </div>
+</div>
 
     <div class="content">
 
