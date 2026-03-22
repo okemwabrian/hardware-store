@@ -92,3 +92,9 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 AFRICASTALKING_USERNAME = os.environ.get('AFRICASTALKING_USERNAME', 'sandbox')
 AFRICASTALKING_API_KEY = os.environ.get('AFRICASTALKING_API_KEY', 'your_api_key_here')
 OWNER_PHONE = os.environ.get('OWNER_PHONE', '+254712345678')
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app',
+    'https://*.ngrok-free.dev',
+    'http://127.0.0.1:8000',
+]

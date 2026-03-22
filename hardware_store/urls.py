@@ -13,6 +13,7 @@ def logout_view(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('reports.urls')),
+    path('', lambda request: redirect('dashboard')),
     path('accounts/login/', auth_views.LoginView.as_view(
         template_name='registration/login.html'
     ), name='login'),
